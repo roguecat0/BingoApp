@@ -1,6 +1,8 @@
 package com.example.bingoapp
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,9 +16,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            BingoApp()
+            BingoApp(shareBingo = {bingoValues: String -> shareBingo(bingoValues)})
         }
     }
+
+    private fun shareBingo(bingoValues: String) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            val sendStr = "https://www.bingo.be/$bingoValues"
+            Log.i("activity",sendStr)
+            putExtra(Intent.EXTRA_TEXT, sendStr)
+            putExtra(Intent.EXTRA_TITLE, "Import Bingo")
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
+    }
+
 }
 
 @Preview(showBackground = true,

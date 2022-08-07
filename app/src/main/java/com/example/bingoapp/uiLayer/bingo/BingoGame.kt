@@ -27,7 +27,8 @@ fun BingoGame(
             rows = state.bingoGame.size.dim[1],
             itemList = state.bingoGame.items,
             switchPressed = {item -> viewModel.switchPressed(item)},
-            checkComplete = {viewModel.checkComplete()}
+            checkComplete = {viewModel.checkComplete()},
+            isBig = viewModel.state.textIsBig
         )
         if(state.bingoGame.complete){
             CompleteAlert(
@@ -44,13 +45,14 @@ fun GameUI(
     rows: Int,
     itemList: List<BingoItem>,
     switchPressed: (BingoItem)->Unit,
-    checkComplete: ()-> Unit
+    checkComplete: ()-> Unit,
+    isBig: Boolean
 ) {
 
     LazyVerticalGrid(columns = GridCells.Fixed(rows),
         contentPadding = PaddingValues(8.dp)){
         items(itemList){ item ->
-            BingoPick(item,switchPressed,checkComplete)
+            BingoPick(item,switchPressed,checkComplete,isBig)
         }
     }
 }
@@ -58,7 +60,8 @@ fun GameUI(
 fun BingoPick(
     item: BingoItem,
     switchPressed: (BingoItem)->Unit,
-    checkComplete: ()-> Unit
+    checkComplete: ()-> Unit,
+    isBig: Boolean
 
 ){
     OutlinedCard(
@@ -77,6 +80,8 @@ fun BingoPick(
     ){
         Text(
             text = item.name,
+            style = if(isBig) MaterialTheme.typography.bodySmall
+                else MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxSize()
@@ -130,7 +135,8 @@ fun BingoPickPreview(){
     BingoPick(
         item = BingoItem("yolo"),
         switchPressed = {it},
-        checkComplete = {}
+        checkComplete = {},
+        isBig = true
     )
 }
 
@@ -144,7 +150,12 @@ fun BingoGamePreview(){
             "hello","goodbye","always snows",
             "fuck","what","am I doing","today",
             "nothing I guess","your right").map { BingoItem(it) }
-        GameUI(rows = 3, itemList = li, switchPressed = {it}, checkComplete = {})
+        GameUI(rows = 3,
+            itemList = li,
+            switchPressed = {it},
+            checkComplete = {},
+            isBig = false
+        )
     }
 
 

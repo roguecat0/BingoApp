@@ -1,10 +1,9 @@
 package com.example.bingoapp.dataLayer.repository
 
+import com.example.bingoapp.common.BingoDimention
+import com.example.bingoapp.common.BingoItem
 import com.example.bingoapp.common.GameMode
-import com.example.bingoapp.dataLayer.dataSource.BingoData
-import com.example.bingoapp.dataLayer.dataSource.ListItems
-import com.example.bingoapp.dataLayer.dataSource.toGameUI
-import com.example.bingoapp.dataLayer.dataSource.toOptionUI
+import com.example.bingoapp.dataLayer.dataSource.*
 import com.example.bingoapp.uiLayer.models.BingoGameUI
 import com.example.bingoapp.uiLayer.models.BingoOptionUI
 import com.example.bingoapp.uiLayer.models.toData
@@ -104,4 +103,20 @@ class BingoRepository {
         val i1d = index[0]*width+index[1]
         return boolMap[i1d]
     }
+    fun getBingoShareData(id: Int) : String {
+        return ListItems.getBingoInfo(id).toBingoValues()
+    }
+    fun importToBingo(bingoValues: String) : BingoGameUI {
+        val bList = bingoValues.replace("_Q"," ").split("-4-")
+        val iList = bList.last().split("&X")
+        return BingoGameUI(
+            name = bList[0],
+            size = BingoDimention.fromDim(bList[1]),
+            random = bList[2].toBoolean(),
+//         mode = GameMode.fromName(bList(3)),
+            items = iList.map(){item -> BingoItem(name = item) }
+        )
+    }
+
+
 }

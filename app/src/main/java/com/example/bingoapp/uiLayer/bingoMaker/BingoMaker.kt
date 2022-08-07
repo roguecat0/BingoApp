@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -111,8 +111,8 @@ fun ButtonRow(
                     .outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface),
                 modifier = Modifier.padding(8.dp).width(140.dp)) {
                 Icon(
-                    imageVector = if (settings) Icons.Default.Send
-                        else Icons.Default.Close,
+                    imageVector = if (settings) Icons.Default.ArrowForward
+                        else Icons.Default.ArrowBack,
                     contentDescription = null,
                     modifier = Modifier.padding(end = 4.dp)
                 )

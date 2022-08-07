@@ -18,10 +18,13 @@ import com.example.bingoapp.dataLayer.dataSource.toOptionUI
 import com.example.bingoapp.uiLayer.bingoList.components.BingoListItem
 
 @Composable
-fun BingoList(onItemClick: (Int) -> Unit,
-            onFabClick: () -> Unit,
-            viewModel: BingoListViewModel = viewModel(),
-            editBingo: (Int) -> Unit){
+fun BingoList(
+    onItemClick: (Int) -> Unit,
+    onFabClick: () -> Unit,
+    viewModel: BingoListViewModel = viewModel(),
+    editBingo: (Int) -> Unit,
+    shareBingo: (String) -> Unit
+){
     val state: BingoListState = viewModel.state
     Box{
         LazyColumn(
@@ -36,13 +39,24 @@ fun BingoList(onItemClick: (Int) -> Unit,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+                Spacer(modifier = Modifier.height(20.dp))
+                Divider(
+                    thickness = 1.dp,
+                    modifier = Modifier.width(250.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer
+                )
+                Spacer(modifier = Modifier.height(20.dp))
             }
             items(state.bingoList.reversed()) { bingo ->
                 BingoListItem(
                     bingo = bingo,
                     onItemClick = onItemClick,
                     editBingo = editBingo,
-                    deleteBingo = {id: Int -> viewModel.deleteBingo(id)}
+                    deleteBingo = {id: Int -> viewModel.deleteBingo(id)},
+                    shareBingo = shareBingo,
+                    getBingoShareData = {id: Int -> viewModel.getBingoShareData(id)},
+                    switchExpanded = {id : Int -> viewModel.switchExpanded(id)},
+                    expandedOff = {id : Int -> viewModel.expandedOff(id)}
                 )
             }
             item{
@@ -82,7 +96,11 @@ fun BingoPreview() {
                     bingo = bingo,
                     onItemClick = {  },
                     editBingo = {  },
-                    deleteBingo = {}
+                    deleteBingo = {},
+                    shareBingo = {},
+                    getBingoShareData = {"hello"},
+                    switchExpanded = {},
+                    expandedOff = {}
                 )
             }
             item{

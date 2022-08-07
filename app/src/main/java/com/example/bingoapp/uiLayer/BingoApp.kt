@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.bingoapp.uiLayer.bingo.BingoGame
 import com.example.bingoapp.uiLayer.bingoList.BingoList
 import com.example.bingoapp.uiLayer.bingoMaker.BingoMaker
@@ -25,7 +26,9 @@ import com.example.compose.BingoAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BingoApp(){
+fun BingoApp(
+    shareBingo: (String) -> Unit
+){
     BingoAppTheme {
         val navController = rememberNavController()
         val backstackEntry = navController.currentBackStackEntryAsState()
@@ -55,7 +58,8 @@ fun BingoApp(){
             ) { innerPadding ->
                 BingoNavHost(
                     navController = navController,
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(innerPadding),
+                    shareBingo = shareBingo
                 )
             }
 
@@ -69,6 +73,7 @@ fun BingoApp(){
 fun BingoNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    shareBingo: (String) -> Unit
 ){
     NavHost(navController = navController,
     startDestination = Screen.BingoListScreen.name,
@@ -79,15 +84,23 @@ fun BingoNavHost(
                     navigateToBingoGame(navController,id) },
                 onFabClick = {navController
                     .navigate("${Screen.BingoMakerScreen.name}/")},
-                editBingo = {id: Int -> navigateToEditMaker(navController,id)}
+                editBingo = {id: Int -> navigateToEditMaker(navController,id)},
+                shareBingo = shareBingo
             )
         }
+        val uri = "https://www.bingo.be"
         composable(
             route = "${Screen.BingoMakerScreen.name}/?BingoId={BingoId}",
-            arguments = listOf(navArgument("BingoId") {
+            arguments = listOf(
+                navArgument("BingoId") {
                     defaultValue = -1
-                    type = NavType.IntType
-            })
+                    type = NavType.IntType },
+                navArgument("bingoValues"){
+                    defaultValue = ""
+                    type = NavType.StringType
+                }
+            ),
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/{bingoValues}" })
         ) {
 
             BingoMaker(navToList = {navController.navigate(Screen.BingoListScreen.name)})
@@ -123,5 +136,5 @@ private fun navigateToEditMaker(navController: NavHostController, id: Int) {
     heightDp = 700)
 @Composable
 fun AppPreview(){
-    BingoApp()
+    BingoApp({})
 }

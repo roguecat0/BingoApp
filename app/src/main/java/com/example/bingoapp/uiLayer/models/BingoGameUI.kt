@@ -25,3 +25,4 @@ fun BingoGameUI.toData(): BingoData {
         mode = mode
     )
 }
+fun BingoGameUI.isTextBig(): Boolean = size.dim[0]*size.dim[1]>=20

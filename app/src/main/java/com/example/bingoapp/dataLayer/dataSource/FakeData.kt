@@ -34,6 +34,13 @@ fun BingoData.toGameUI(): BingoGameUI {
         mode = mode
     )
 }
+fun BingoData.toBingoValues(): String {
+    var bingoStr = "$name-4-${size.dimStr}-4-$random-4-${mode.name}-4-"
+    items.forEach(){
+        bingoStr += "${it.name}&X"
+    }
+    return bingoStr.dropLast(2).replace(" ","_Q")
+}
 
 object ListItems {
     val BingoList: MutableList<BingoData> = mutableListOf(

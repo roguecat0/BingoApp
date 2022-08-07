@@ -17,6 +17,7 @@ class BingoMakerViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val id: Int = savedStateHandle["BingoId"]?:-1
+    private val bingoValues: String = savedStateHandle["bingoValues"]?:""
     private val repository = BingoRepository()
     var state by mutableStateOf(BingoMakerState())
         private set
@@ -32,6 +33,9 @@ class BingoMakerViewModel(
     }
     private fun createNewState(){
         state = BingoMakerState()
+    }
+    private fun createStateFromImport(){
+        state = BingoMakerState(bingoGame = repository.importToBingo(bingoValues))
     }
     fun editName(name: String){
         val game = state.bingoGame.copy(name = name)
@@ -87,11 +91,16 @@ class BingoMakerViewModel(
         state = state.copy(bingoGame = game, tempItem = "")
     }
     init{
-        Log.i("view1","id: $id")
+        Log.i("view1","id: $id\nbingovalues: $bingoValues")
 
         if(id==-1){
-            createNewState()
-            Log.i("viewNew",state.toString())
+            if(bingoValues.isEmpty()){
+                createNewState()
+                Log.i("viewNew",state.toString())
+            } else{
+                createStateFromImport()
+                Log.i("viewNew",state.toString())
+            }
         } else {
             editMakerState(id)
             Log.i("viewEdit",state.toString())

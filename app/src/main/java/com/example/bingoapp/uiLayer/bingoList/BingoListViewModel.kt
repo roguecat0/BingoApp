@@ -23,6 +23,23 @@ class BingoListViewModel(
         repository.deleteBingo(id)
         getBingoList()
     }
+    fun getBingoShareData(id: Int) : String {
+        return repository.getBingoShareData(id)
+    }
+    fun switchExpanded(id: Int){
+        val list = state.bingoList.map {
+            if (state.bingoList.indexOf(it) == id) it.copy(menu = !it.menu)
+            else it
+        }
+        state = state.copy(bingoList = list)
+    }
+    fun expandedOff(id: Int){
+        val list = state.bingoList.map {
+            if (state.bingoList.indexOf(it) == id) it.copy(menu = false)
+            else it
+        }
+        state = state.copy(bingoList = list)
+    }
     init{
         getBingoList()
     }

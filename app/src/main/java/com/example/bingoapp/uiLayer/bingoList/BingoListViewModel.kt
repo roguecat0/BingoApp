@@ -4,14 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.bingoapp.dataLayer.dataSource.BingoOption
-
-import com.example.bingoapp.dataLayer.repository.BingoListRepository
+import com.example.bingoapp.dataLayer.repository.BingoRepository
 
 class BingoListViewModel(
 
 ) : ViewModel() {
-    private val repository = BingoListRepository()
+    private val repository = BingoRepository()
     var state by  mutableStateOf(BingoListState())
         private set
 
@@ -21,8 +19,9 @@ class BingoListViewModel(
     private fun getBingoList(){
         state = BingoListState(repository.getBingoList())
     }
-    fun getBingoInfo(id: Int) : BingoOption {
-        return repository.getBingoInfo(id)
+    fun deleteBingo(id: Int){
+        repository.deleteBingo(id)
+        getBingoList()
     }
     init{
         getBingoList()

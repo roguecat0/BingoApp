@@ -1,34 +1,86 @@
 package com.example.bingoapp.dataLayer.dataSource
 
+import android.util.Log
+import com.example.bingoapp.common.BingoDimention
+import com.example.bingoapp.common.BingoItem
+import com.example.bingoapp.common.GameMode
+import com.example.bingoapp.uiLayer.models.BingoGameUI
 import com.example.bingoapp.uiLayer.models.BingoOptionUI
 
-data class BingoOption(
+data class BingoData(
     val name: String,
     val id: Int,
-    val size: List<Int>
+    val size: BingoDimention,
+    val items: List<BingoItem>,
+    val random: Boolean = true,
+    val complete: Boolean = false,
+    val mode: GameMode = GameMode.fromSize(size)
 )
-fun BingoOption.toUI(): BingoOptionUI {
+fun BingoData.toOptionUI(): BingoOptionUI {
     return BingoOptionUI(
         name = name,
-        size = size
+        size = size.dimStr,
+        id = id
+    )
+}
+fun BingoData.toGameUI(): BingoGameUI {
+    return BingoGameUI(
+        name = name,
+        size = size,
+        id = id,
+        items = items,
+        random = random,
+        complete = complete,
+        mode = mode
     )
 }
 
 object ListItems {
-    val BingoList: List<BingoOption> = listOf(
-        BingoOption(
+    val BingoList: MutableList<BingoData> = mutableListOf(
+        BingoData(
             "movies",
             0,
-            listOf(3,3)
+            BingoDimention.d3b3,
+            listOf(
+                BingoItem("a"),
+                BingoItem("b"),
+                BingoItem("c"),
+                BingoItem("d"),
+                BingoItem("e"),
+                BingoItem("f"),
+                BingoItem("g"),
+                BingoItem("h"),
+                BingoItem("i"))
         ),
-        BingoOption(
+        BingoData(
             "makers",
             1,
-            listOf(4,4)
+            BingoDimention.d2b2,
+            listOf(BingoItem("a"),
+                BingoItem("b"),
+                BingoItem("c"),
+                BingoItem("d"))
+        ),
+        BingoData(
+            "games",
+            2,
+            BingoDimention.d2b3,
+            listOf(
+                BingoItem("hi my friend"),
+                BingoItem("fuck"),
+                BingoItem("breakin the wall in the summer"),
+                BingoItem("what"),
+                BingoItem("are you doing"),
+                BingoItem("f")
+            )
         )
     )
-    fun getBingoInfo(id: Int): BingoOption {
-        return BingoList.first() { it.id == id }
+    fun getBingoInfo(id: Int): BingoData {
+        Log.i("data1","id: $id")
+
+        val bd = BingoList.first() { it.id == id }
+        Log.i("data2","id: $bd")
+        return bd
     }
 }
 

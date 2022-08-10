@@ -16,6 +16,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bingoapp.common.BingoDimention
 import com.example.bingoapp.uiLayer.bingo.components.BingoSettings
 import com.example.bingoapp.uiLayer.bingoMaker.components.WordItems
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -23,6 +27,7 @@ fun BingoMaker(
     navToList: ()->Unit,
     viewModel: BingoMakerViewModel = hiltViewModel()
 ){
+
     val focusManager = LocalFocusManager.current
     Box{
         Column(
@@ -83,6 +88,7 @@ fun ButtonRow(
     addBingo: () -> Boolean,
     switchSettings: () -> Unit
 ) {
+    val coroutineScope = CoroutineScope(Dispatchers.Main)
     Box(
         contentAlignment = Alignment.BottomEnd,
         modifier = Modifier.fillMaxSize(),
@@ -94,10 +100,13 @@ fun ButtonRow(
         ){
             Button(
                 onClick = {
-                    if (addBingo())
-                        navToList()
-                    },
-//                colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface),
+                    coroutineScope.launch(){
+                        if (addBingo()){
+                            delay(30)
+                            navToList()
+                        }
+
+                    }},
                 modifier = Modifier.padding(8.dp)) {
                 Icon(
                     imageVector = Icons.Default.Add,

@@ -1,35 +1,65 @@
-package com.example.bingoapp.dataLayer.repository
+package com.example.bingoapp.data.repository
 
 import com.example.bingoapp.common.BingoDimention
 import com.example.bingoapp.common.BingoItem
 import com.example.bingoapp.common.GameMode
-import com.example.bingoapp.dataLayer.dataSource.*
+import com.example.bingoapp.data.dataSource.BingoDao
+import com.example.bingoapp.data.dataSource.Entities.BingoEntity
 import com.example.bingoapp.uiLayer.models.BingoGameUI
 import com.example.bingoapp.uiLayer.models.BingoOptionUI
-import com.example.bingoapp.uiLayer.models.toData
+import com.example.bingoapp.uiLayer.models.toBingoValues
+import com.example.bingoapp.uiLayer.models.toEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class BingoRepository {
-    fun getBingoList() : List<BingoOptionUI>{
-        return ListItems.BingoList.map { it.toOptionUI() }.toList()
-    }
-    fun getBingoInfo(id: Int) : BingoGameUI{
-        return ListItems.getBingoInfo(id).toGameUI()
-    }
-    fun addBingo(bingo: BingoGameUI){
-        val bd = bingo.copy(id = getMaxId()+1).toData()
-        ListItems.BingoList.add(bd)
+class BingoRepository(
+    private val bingoDao: BingoDao
+    ) {
 
-    }
-    fun editBingo(bingo: BingoGameUI){
-        deleteBingo(bingo.id)
-        ListItems.BingoList.add(bingo.toData())
+    // data base interaction
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    fun addBingo(bingo: BingoGameUI) {
+        coroutineScope.launch(Dispatchers.IO) {
+            bingoDao.deleteBingoItems(bingo.id)
+            bingoDao.addNewBingo(
+                name = bingo.name,
+                size = bingo.size.dimStr,
+                random = bingo.random,
+                mode = bingo.mode.name
+            )
+            val id = bingoDao.getMaxId()?:1
+            bingoDao.addBingoItems(bingo.items.map { it.toItem(id) })
+
+        }
     }
     fun deleteBingo(id: Int){
-        ListItems.BingoList.removeIf { b: BingoData -> b.id == id }
+        coroutineScope.launch(Dispatchers.IO) {
+            bingoDao.deleteBingoItems(id)
+            bingoDao.deleteBingoById(id)
+        }
     }
-    fun getMaxId() : Int{
-        val idList = ListItems.BingoList.map { it.id }
-        return idList.maxOrNull()?:0
+    suspend fun getBingoList() : List<BingoOptionUI> = withContext(Dispatchers.IO){
+        bingoDao.getListBingos().map { it.toOptionUI() }
+    }
+    suspend fun getBingoInfo(id: Int) : BingoGameUI = withContext(Dispatchers.IO){
+        val bingo = bingoDao.getBingoById(id)?: BingoEntity()
+        val items = bingoDao.getBingoItems(id)
+        BingoGameUI(
+            name = bingo.name,
+            id = bingo.id,
+            size = BingoDimention.fromDim(bingo.size),
+            items = items.map { it.toBingoItem() },
+            random = bingo.random
+        )
+    }
+    fun editBingo(bingo: BingoGameUI){
+        coroutineScope.launch(Dispatchers.IO) {
+            bingoDao.deleteBingoItems(bingo.id)
+            bingoDao.updateBingo(bingo.toEntity())
+            bingoDao.addBingoItems(bingo.items.map { it.toItem(bingo.id) })
+        }
     }
     fun checkComplete(bingo: BingoGameUI) : Boolean =
         when(bingo.mode){
@@ -103,8 +133,9 @@ class BingoRepository {
         val i1d = index[0]*width+index[1]
         return boolMap[i1d]
     }
-    fun getBingoShareData(id: Int) : String {
-        return ListItems.getBingoInfo(id).toBingoValues()
+    suspend fun getBingoShareData(id: Int) : String {
+        val bingo = getBingoInfo(id)
+        return bingo.toBingoValues()
     }
     fun importToBingo(bingoValues: String) : BingoGameUI {
         val bList = bingoValues.replace("_Q"," ").split("-4-")

@@ -21,15 +21,17 @@ fun WordItems(
     editName: (String) -> Unit,
     addItem: () -> Unit,
     deleteItem: (String) -> Unit,
-    clearFocus: () -> Unit
+    clearFocus: () -> Unit,
+    size: List<Int>,
+    isError: Boolean
 ){
     OutlinedTextField(
         value = name,
+        isError = isError,
         onValueChange = {
             editName(it) },
-        label = { Text("Add bingo Items") },
+        label = { Text("Add bingo Items [${items.size}/${size[0]*size[1]}]") },
         singleLine = true,
-//      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
                 if(name.isNotEmpty())

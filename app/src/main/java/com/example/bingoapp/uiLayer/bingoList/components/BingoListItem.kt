@@ -21,8 +21,7 @@ fun BingoListItem(
     onItemClick: (Int) -> Unit,
     editBingo: (Int) -> Unit,
     deleteBingo: (Int) -> Unit,
-    shareBingo: (String) -> Unit,
-    getBingoShareData: (Int) -> String,
+    getBingoShareData: (Int) -> Unit,
     expandedOff: (Int) -> Unit,
     switchExpanded: (Int) -> Unit
 ) {
@@ -87,64 +86,15 @@ fun BingoListItem(
                             contentDescription = null,)},
                         text = {Text("Delete")},
                         onClick = { expandedOff(bingo.id)
-                            deleteBingo })
+                            deleteBingo(bingo.id) })
                     DropdownMenuItem(
                         leadingIcon = {Icon(imageVector = Icons.Default.Share,
                             contentDescription = null,)},
                         text = {Text("Share")},
                         onClick = { expandedOff(bingo.id)
-                            shareBingo(getBingoShareData(bingo.id))})
+                            getBingoShareData(bingo.id)})
                 }
             }
-//            Icon(
-//                imageVector = Icons.Default.Edit,
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//                    .wrapContentHeight(Alignment.CenterVertically)
-//                    .clickable { editBingo(bingo.id)
-//                        val bingoShareData: String = getBingoShareData(bingo.id)
-//                        shareBingo(bingoShareData)
-//                    }
-//                    .padding(10.dp),
-//                tint = MaterialTheme.colorScheme.onSurfaceVariant
-//            )
-//            Icon(
-//                imageVector = Icons.Default.Close,
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//                    .wrapContentHeight(Alignment.CenterVertically)
-//                    .clickable { //deleteBingo(bingo.id)
-//                        val bingoShareData: String = getBingoShareData(bingo.id)
-//                        shareBingo(bingoShareData)
-//                    }
-//                    .padding(5.dp),
-//                tint = MaterialTheme.colorScheme.onSurfaceVariant
-//            )
-//            TextButton(onClick = { editBingo(bingo.id) },
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//                    .wrapContentHeight(Alignment.CenterVertically)
-//
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Edit,
-//                    contentDescription = null,
-//                    modifier = Modifier.padding(end = 0.dp)
-//                )
-//            }
-//            TextButton(onClick = { deleteBingo(bingo.id) },
-//                    modifier = Modifier
-//                        .fillMaxHeight()
-//                        .wrapContentHeight(Alignment.CenterVertically)
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Close,
-//                    contentDescription = null,
-//                    modifier = Modifier.padding(start = 0.dp)
-//                )
-//            }
         }
     }
 }

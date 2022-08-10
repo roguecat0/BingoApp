@@ -3,7 +3,7 @@ package com.example.bingoapp.uiLayer.models
 import com.example.bingoapp.common.BingoDimention
 import com.example.bingoapp.common.BingoItem
 import com.example.bingoapp.common.GameMode
-import com.example.bingoapp.dataLayer.dataSource.BingoData
+import com.example.bingoapp.data.dataSource.Entities.BingoEntity
 
 data class BingoGameUI(
     val name: String = "",
@@ -14,15 +14,21 @@ data class BingoGameUI(
     var complete: Boolean = false,
     val mode: GameMode = GameMode.fromSize(size)
 )
-fun BingoGameUI.toData(): BingoData {
-    return BingoData(
+fun BingoGameUI.isTextBig(): Boolean = size.dim[0]*size.dim[1]>=20
+
+fun BingoGameUI.toEntity(): BingoEntity {
+    return BingoEntity(
         name = name,
-        size = size,
+        size = size.dimStr,
         id = id,
-        items = items,
         random = random,
-        complete = complete,
-        mode = mode
+        mode = mode.name
     )
 }
-fun BingoGameUI.isTextBig(): Boolean = size.dim[0]*size.dim[1]>=20
+fun BingoGameUI.toBingoValues(): String {
+    var bingoStr = "$name-4-${size.dimStr}-4-$random-4-${mode.name}-4-"
+    items.forEach(){
+        bingoStr += "${it.name}&X"
+    }
+    return bingoStr.dropLast(2).replace(" ","_Q")
+}

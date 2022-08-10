@@ -5,23 +5,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.bingoapp.common.BingoItem
-import com.example.bingoapp.dataLayer.repository.BingoRepository
-import com.example.bingoapp.uiLayer.models.BingoGameUI
+import com.example.bingoapp.data.repository.BingoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BingoGameViewModel(
-    savedStateHandle: SavedStateHandle
+@HiltViewModel
+class BingoGameViewModel @Inject constructor(
+    private val repository: BingoRepository,
+    private  val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
     private val id: Int = savedStateHandle["BingoId"]?:0
-    private val repository = BingoRepository()
     var state by  mutableStateOf(BingoGameState())
         private set
 //    business logic
-    private fun getBingoInfo(id: Int) : BingoGameUI {
-        return repository.getBingoInfo(id)
-    }
     private fun setGameState(id: Int) {
-        state = BingoGameState(getBingoInfo(id))
+        viewModelScope.launch {
+            val bi = repository.getBingoInfo(id)
+            state = BingoGameState(bi)
+        }
     }
     fun switchPressed(item: BingoItem){
         val i = state.bingoGame.items.indexOf(item)

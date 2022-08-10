@@ -1,6 +1,5 @@
 package com.example.bingoapp.uiLayer
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -123,11 +122,9 @@ fun BingoNavHost(
 
 private fun navigateToBingoGame(navController: NavHostController, id: Int) {
     val bingoGameName = Screen.BingoGameScreen.name
-    Log.i("nav game","${bingoGameName}/$id")
     navController.navigate("${bingoGameName}/$id")
 }
 private fun navigateToEditMaker(navController: NavHostController, id: Int) {
-    Log.i("nav maker","${Screen.BingoMakerScreen.name}/?BingoId=$id")
     navController.navigate("${Screen.BingoMakerScreen.name}/?BingoId=$id")
 }
 

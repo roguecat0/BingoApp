@@ -10,20 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.bingoapp.dataLayer.dataSource.ListItems
-import com.example.bingoapp.dataLayer.dataSource.toOptionUI
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bingoapp.uiLayer.bingoList.components.BingoListItem
 
 @Composable
 fun BingoList(
     onItemClick: (Int) -> Unit,
     onFabClick: () -> Unit,
-    viewModel: BingoListViewModel = viewModel(),
     editBingo: (Int) -> Unit,
-    shareBingo: (String) -> Unit
+    shareBingo: (String) -> Unit,
+    viewModel: BingoListViewModel = hiltViewModel()
 ){
     val state: BingoListState = viewModel.state
     Box{
@@ -53,8 +50,7 @@ fun BingoList(
                     onItemClick = onItemClick,
                     editBingo = editBingo,
                     deleteBingo = {id: Int -> viewModel.deleteBingo(id)},
-                    shareBingo = shareBingo,
-                    getBingoShareData = {id: Int -> viewModel.getBingoShareData(id)},
+                    getBingoShareData = {id: Int -> viewModel.shareData(id, shareBingo = shareBingo)},
                     switchExpanded = {id : Int -> viewModel.switchExpanded(id)},
                     expandedOff = {id : Int -> viewModel.expandedOff(id)}
                 )
@@ -68,44 +64,6 @@ fun BingoList(
                 .align(Alignment.BottomEnd)
                 .padding(50.dp)) {
             Icon(Icons.Filled.Add,"")
-        }
-    }
-
-}
-@Preview(showBackground = true,
-    widthDp = 390)
-@Composable
-fun BingoPreview() {
-    val bingoList = ListItems.BingoList.map { it.toOptionUI() }
-    Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item{
-                Text(
-                    text = "Bingo List",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            items(bingoList) { bingo ->
-                BingoListItem(
-                    bingo = bingo,
-                    onItemClick = {  },
-                    editBingo = {  },
-                    deleteBingo = {},
-                    shareBingo = {},
-                    getBingoShareData = {"hello"},
-                    switchExpanded = {},
-                    expandedOff = {}
-                )
-            }
-            item{
-                Spacer(Modifier.height(100.dp))
-            }
         }
     }
 

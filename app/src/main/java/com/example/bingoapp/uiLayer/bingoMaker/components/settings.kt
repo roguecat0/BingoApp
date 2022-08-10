@@ -18,7 +18,8 @@ fun BingoSettings(
     clearFocus: () -> Unit,
     changeExpanded: () -> Unit, disableExpanded: () -> Unit,
     setDimension: (BingoDimention) -> Unit,
-    random: Boolean, switchRandom: () -> Unit
+    random: Boolean, switchRandom: () -> Unit,
+    isError: Boolean
 ) {
     Column {
         OutlinedTextField(
@@ -27,7 +28,7 @@ fun BingoSettings(
                 editName(it) },
             label = { Text("Bingo Name") },
             singleLine = true,
-//      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            isError = isError,
             keyboardActions = KeyboardActions(onDone = {clearFocus()})
         )
         Spacer(Modifier.height(15.dp))

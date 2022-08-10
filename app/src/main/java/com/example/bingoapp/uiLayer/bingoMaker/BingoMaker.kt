@@ -1,6 +1,5 @@
 package com.example.bingoapp.uiLayer.bingoMaker
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -13,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bingoapp.common.BingoDimention
 import com.example.bingoapp.uiLayer.bingo.components.BingoSettings
 import com.example.bingoapp.uiLayer.bingoMaker.components.WordItems
@@ -21,8 +20,9 @@ import com.example.bingoapp.uiLayer.bingoMaker.components.WordItems
 
 @Composable
 fun BingoMaker(
-    viewModel: BingoMakerViewModel = viewModel(),
-    navToList: ()->Unit){
+    navToList: ()->Unit,
+    viewModel: BingoMakerViewModel = hiltViewModel()
+){
     val focusManager = LocalFocusManager.current
     Box{
         Column(
@@ -30,7 +30,7 @@ fun BingoMaker(
             modifier = Modifier.fillMaxWidth()
         ){
             Text(
-                text = "${viewModel.state.bingoGame.name}",
+                text = viewModel.state.bingoGame.name,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -42,16 +42,14 @@ fun BingoMaker(
                     dim = viewModel.state.bingoGame.size,
                     editName = {name: String -> viewModel.editName(name)},
                     random = viewModel.state.bingoGame.random,
+                    isError = viewModel.state.nameError,
                     clearFocus = {focusManager.clearFocus()},
                     changeExpanded = {
-                        Log.i("maker","change")
                         viewModel.changeExpanded()},
                     disableExpanded = {
-                        Log.i("maker","disable")
                         viewModel.disableExpanded()},
                     setDimension = {
                             dim: BingoDimention ->
-                        Log.i("maker","set dim")
                         viewModel.setDimensions(dim)},
                     switchRandom = {viewModel.switchRandom()}
                 )
@@ -60,17 +58,19 @@ fun BingoMaker(
                 WordItems(
                     items = viewModel.state.bingoGame.items.map{it.name},
                     name = viewModel.state.tempItem,
+                    size = viewModel.state.bingoGame.size.dim,
+                    isError = viewModel.state.itemError,
                     editName = {name: String -> viewModel.editTempName(name)},
                     addItem = {viewModel.addItem()},
                     deleteItem = {item -> viewModel.deleteItem(item)},
-                    clearFocus = {focusManager.clearFocus()},
+                    clearFocus = {focusManager.clearFocus()}
                 )
             }
         }
         ButtonRow(
             settings = viewModel.state.settings,
             navToList = navToList,
-            addBingo = {viewModel.addBingo()},
+            addBingo = {viewModel.tryAddBingo()},
             switchSettings = {viewModel.switchSettings()}
         )
 
@@ -80,7 +80,7 @@ fun BingoMaker(
 fun ButtonRow(
     settings: Boolean,
     navToList: () -> Unit,
-    addBingo: () -> Unit,
+    addBingo: () -> Boolean,
     switchSettings: () -> Unit
 ) {
     Box(
@@ -94,8 +94,9 @@ fun ButtonRow(
         ){
             Button(
                 onClick = {
-                    navToList()
-                    addBingo()},
+                    if (addBingo())
+                        navToList()
+                    },
 //                colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface),
                 modifier = Modifier.padding(8.dp)) {
                 Icon(

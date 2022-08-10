@@ -4,41 +4,49 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.bingoapp.dataLayer.repository.BingoRepository
+import androidx.lifecycle.viewModelScope
+import com.example.bingoapp.data.repository.BingoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BingoListViewModel(
-
+@HiltViewModel
+class BingoListViewModel @Inject constructor(
+    private val repository: BingoRepository
 ) : ViewModel() {
-    private val repository = BingoRepository()
     var state by  mutableStateOf(BingoListState())
         private set
 
-
-
 //    business logic
     private fun getBingoList(){
-        state = BingoListState(repository.getBingoList())
+        viewModelScope.launch {
+            state = BingoListState(repository.getBingoList())
+        }
     }
     fun deleteBingo(id: Int){
-        repository.deleteBingo(id)
-        getBingoList()
+        viewModelScope.launch {
+            repository.deleteBingo(id)
+            delay(20)
+            state = BingoListState(repository.getBingoList())
+        }
     }
-    fun getBingoShareData(id: Int) : String {
-        return repository.getBingoShareData(id)
+    fun shareData(id: Int, shareBingo: (String) -> Unit) {
+        viewModelScope.launch {
+            val data: String = repository.getBingoShareData(id)
+            delay(30)
+            shareBingo(data)
+        }
     }
     fun switchExpanded(id: Int){
         val list = state.bingoList.map {
-            if (state.bingoList.indexOf(it) == id) it.copy(menu = !it.menu)
+            if (it.id == id) it.copy(menu = !it.menu)
             else it
         }
         state = state.copy(bingoList = list)
     }
     fun expandedOff(id: Int){
-        val list = state.bingoList.map {
-            if (state.bingoList.indexOf(it) == id) it.copy(menu = false)
-            else it
-        }
-        state = state.copy(bingoList = list)
+        getBingoList()
     }
     init{
         getBingoList()

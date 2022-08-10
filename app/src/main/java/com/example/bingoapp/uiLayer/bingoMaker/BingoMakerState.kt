@@ -7,5 +7,7 @@ data class BingoMakerState(
     val settings: Boolean = true,
     val expandedMenu: Boolean = false,
     val edit: Boolean = false,
-    val tempItem: String = ""
+    val tempItem: String = "",
+    val nameError: Boolean = false,
+    val itemError: Boolean = false
 )
